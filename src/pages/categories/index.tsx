@@ -28,6 +28,10 @@ import type { NextPageWithLayout } from "../_app";
 import { api } from "@/utils/api";
 
 const CategoriesPage: NextPageWithLayout = () => {
+  // menggunakan alat untuk mengelola data yg di cache trpc sisi klien
+  const apiUtils = api.useUtils();
+
+
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] =
     useState(false);
   const [editCategoryDialogOpen, setEditCategoryDialogOpen] = useState(false);
@@ -47,8 +51,32 @@ const CategoriesPage: NextPageWithLayout = () => {
   const { data: categories, isLoading: categoriesIsLoading } = 
     api.category.getCategories.useQuery();
 
+  // function untuk mengambil data yg akan di input dri category.ts
+  // mutate function untuk create category
+  const { mutate: createCategory } = 
+    api.category.createCategory.useMutation({
+      // reflect perubahan/interaksi frontend sesuai
+      onSuccess: async () => {
+        // 4. invalidate data (data yg skrng tdk valid, harus kasi yg baru)
+        // promise jdi merupakan async 
+        await apiUtils.category.getCategories.invalidate();
+        // 1. berhasil buat kategori baru
+        alert("Successfully created a new category");
+        // 2. keluar dari modal saat di klik create
+        setCreateCategoryDialogOpen(false);
+        // 3. category name modal ke reset jdi 0
+        createCategoryForm.reset();
+      },
+    });
+
+  // CategoryFormSchema untuk validasi form
   const handleSubmitCreateCategory = (data: CategoryFormSchema) => {
-    console.log(data);
+    createCategory({
+      // object diambil dari createCategory category.ts
+      name: data.name,
+    });
+    // alert(data.name)
+    // console.log(data);
   };
 
   const handleSubmitEditCategory = (data: CategoryFormSchema) => {

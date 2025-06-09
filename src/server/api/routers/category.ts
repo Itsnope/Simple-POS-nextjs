@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 
@@ -28,5 +29,30 @@ export const categoryRouter = createTRPCRouter({
 
     // Mengembalikan data 'categories' yang ditemukan dari database.
     return categories;
+  }),
+
+  createCategory: protectedProcedure.input(
+    // input() bisa declare schema object, makanya digunakan zod(z) untuk memastikan tipe data sesuai(runtime type checker)
+    z.object({
+      name: z.string().min(3, "Minimum of 3 characters"),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { db } = ctx;
+
+    const newCategory = await db.category.create({
+      // Berdasarkan model category, cuman data name yg diisi manual, karena yg lain punya nilai default/auto generated
+      data: {
+        name: input.name
+      },
+      select: {
+        id: true,
+        name: true,
+        productCount: true,
+      }
+    });
+
+    
+    return newCategory;
   }),
 });
