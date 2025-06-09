@@ -25,6 +25,7 @@ import type { ReactElement } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { NextPageWithLayout } from "../_app";
+import { api } from "@/utils/api";
 
 const CategoriesPage: NextPageWithLayout = () => {
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] =
@@ -39,6 +40,12 @@ const CategoriesPage: NextPageWithLayout = () => {
   const editCategoryForm = useForm<CategoryFormSchema>({
     resolver: zodResolver(categoryFormSchema),
   });
+
+  // function untuk mengambil data dari db
+  // category diambil dari root.ts (createTRPCRouter)
+  // data: categories, mengganti nama data menjadi categories
+  const { data: categories, isLoading: categoriesIsLoading } = 
+    api.category.getCategories.useQuery();
 
   const handleSubmitCreateCategory = (data: CategoryFormSchema) => {
     console.log(data);
@@ -104,29 +111,17 @@ const CategoriesPage: NextPageWithLayout = () => {
         </div>
       </DashboardHeader>
 
-      <div>
-        {CATEGORIES.length === 0 ? (
-          <div className="rounded-md border">
-            <div className="p-8 text-center">
-              <p className="text-muted-foreground">No categories found</p>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Get started by creating your first category
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {CATEGORIES.filter((cat) => cat.id !== "all").map((category) => (
-              <CategoryCatalogCard
-                key={category.id}
-                name={category.name}
-                productCount={category.count}
-                onEdit={() => handleClickEditCategory(category)}
-                onDelete={() => handleClickDeleteCategory(category.id)}
-              />
-            ))}
-          </div>
-        )}
+      {/* Tampilan UI categoriesnya */}
+      <div className="grid grid-cols-4 gap-4">
+        {categories?.map((category) => {
+          return (
+            <CategoryCatalogCard 
+              key={category.id} 
+              name={category.name} 
+              productCount={category.productCount} 
+            />
+          );
+        })}
       </div>
 
       <AlertDialog

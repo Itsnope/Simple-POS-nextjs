@@ -44,6 +44,9 @@ export const createCallerFactory = t.createCallerFactory;
 
 export const createTRPCRouter = t.router;
 
+// 2 procedure di trpc.ts :
+
+// protected procedure (memastikan yg manggil function adalah user/sdh login, bukan guest/blm login)
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.session.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -57,4 +60,5 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   });
 });
 
+// public procedure
 export const publicProcedure = t.procedure;

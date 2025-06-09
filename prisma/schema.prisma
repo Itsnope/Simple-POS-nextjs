@@ -7,9 +7,23 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+    
+    //sync ke db supabase (dibutuhkan biar cepat, krna proses migrasi/sync itu berat)
+    directUrl = env("DIRECT_URL") 
+
+    // untuk query (fetch,insert,update,del), bagian yg terhubung ke db pooler/connection pooler(proses migrasi bisa lama)
+    url = env("DATABASE_URL") 
+}
+
+// Di prisma, model adalah representasi dari tabel pada database.
+model Category {
+    id String @id @default(uuid())
+
+    name String
+    productCount Int @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    //createdBy String // ID dari org yg bikin data
 }
