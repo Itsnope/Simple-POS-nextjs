@@ -31,7 +31,8 @@ export const categoryRouter = createTRPCRouter({
     return categories;
   }),
 
-  createCategory: protectedProcedure.input(
+  createCategory: protectedProcedure
+  .input(
     // input() bisa declare schema object, makanya digunakan zod(z) untuk memastikan tipe data sesuai(runtime type checker)
     z.object({
       name: z.string().min(3, "Minimum of 3 characters"),
@@ -51,8 +52,23 @@ export const categoryRouter = createTRPCRouter({
         productCount: true,
       }
     });
-
-    
+     
     return newCategory;
+  }),
+
+  deleteCategoryById: protectedProcedure
+  .input(
+    z.object({
+      categoryId: z.string(),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { db } = ctx;
+
+    await db.category.delete({
+      where: {
+        id: input.categoryId,
+      },
+    });
   }),
 });

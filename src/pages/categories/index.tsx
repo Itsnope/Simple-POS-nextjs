@@ -79,6 +79,16 @@ const CategoriesPage: NextPageWithLayout = () => {
     // console.log(data);
   };
 
+  const { mutate: deleteCategoryById } = 
+    api.category.deleteCategoryById.useMutation({
+      onSuccess: async () => {
+        await apiUtils.category.getCategories.invalidate();
+
+        alert("Successfully deleted a new category");
+        setCategoryToDelete(null);
+      }
+    });
+
   const handleSubmitEditCategory = (data: CategoryFormSchema) => {
     console.log(data);
   };
@@ -91,8 +101,19 @@ const CategoriesPage: NextPageWithLayout = () => {
     });
   };
 
+  // fungsi untuk modal delete
   const handleClickDeleteCategory = (categoryId: string) => {
     setCategoryToDelete(categoryId);
+  };
+
+  // fungsi untuk konfirmasi delete
+  const handleConfirmDeleteCategory = () => {
+    // karena categoryId harus string, sedangkan categoryToDelete bisa string bisa null
+    if (!categoryToDelete) return;
+
+    deleteCategoryById({
+      categoryId: categoryToDelete
+    })
   };
 
   return (
@@ -146,7 +167,9 @@ const CategoriesPage: NextPageWithLayout = () => {
             <CategoryCatalogCard 
               key={category.id} 
               name={category.name} 
-              productCount={category.productCount} 
+              productCount={category.productCount}
+              // tombol delete
+              onDelete={() => handleClickDeleteCategory(category.id)}
             />
           );
         })}
@@ -196,7 +219,9 @@ const CategoriesPage: NextPageWithLayout = () => {
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button variant="destructive">Delete</Button>
+            <Button variant="destructive" onClick={handleConfirmDeleteCategory}>
+              Delete
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
