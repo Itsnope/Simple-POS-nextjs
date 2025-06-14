@@ -7,23 +7,41 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    
+
     //sync ke db supabase (dibutuhkan biar cepat, krna proses migrasi/sync itu berat)
-    directUrl = env("DIRECT_URL") 
+    directUrl = env("DIRECT_URL")
 
     // untuk query (fetch,insert,update,del), bagian yg terhubung ke db pooler/connection pooler(proses migrasi bisa lama)
-    url = env("DATABASE_URL") 
+    url = env("DATABASE_URL")
 }
 
 // Di prisma, model adalah representasi dari tabel pada database.
 model Category {
     id String @id @default(uuid())
 
-    name String
-    productCount Int @default(0)
+    name         String
+    productCount Int    @default(0)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     //createdBy String // ID dari org yg bikin data
+    // Product Product[]
+    products Product[]
+}
+
+model Product {
+    id String @id @default(uuid())
+
+    name     String
+    price    Int
+    imageUrl String?
+
+    // foreign key prisma
+    // shift+alt+f = format(men-set @relation)
+    category Category @relation(fields: [categoryId], references: [id])
+    categoryId String
+
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }

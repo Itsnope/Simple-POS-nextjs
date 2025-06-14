@@ -10,8 +10,12 @@ import { Button } from "@/components/ui/button";
 import { PRODUCTS } from "@/data/mock";
 import { ProductMenuCard } from "@/components/shared/product/ProductMenuCard";
 import { ProductCatalogCard } from "@/components/shared/product/ProductCatalogCard";
+import { api } from "@/utils/api";
 
 const ProductsPage: NextPageWithLayout = () => {
+
+  const { data: products } = api.product.getProducts.useQuery();
+
   return (
     <>
       <DashboardHeader>
@@ -28,17 +32,28 @@ const ProductsPage: NextPageWithLayout = () => {
       </DashboardHeader>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {PRODUCTS.map((product) => (
+        {/* {products?.map((product) => (
           <ProductCatalogCard
             key={product.id}
             name={product.name}
             price={product.price}
-            image={product.image ?? ""}
-            category={product.category}
+            image={product.imageUrl ?? ""}
+            category={product.category.name}
             onEdit={() => void 0}
             onDelete={() => void 0}
           />
-        ))}
+        ))} */}
+        {products?.map((product) => {
+            return (
+              <ProductCatalogCard 
+                key={product.id}
+                name={product.name}
+                price={product.price}
+                image={product.imageUrl ?? ""}
+                category={product.category.name}
+              />
+            );
+          })}
       </div>
     </>
   );
