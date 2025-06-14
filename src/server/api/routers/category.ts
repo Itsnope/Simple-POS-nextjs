@@ -9,7 +9,7 @@ export const categoryRouter = createTRPCRouter({
   // Setiap method harus panggil 1 procedure dri trpc.ts (../trpc)
   // public (akses dgn auth) atau protected (akses tanpa auth)
 
-
+  // ========================READ========================
   // 'get' hitungannya untuk dapat data, jadi pakai 'query()'
   getCategories: protectedProcedure.query(async ({ ctx }) => {
 
@@ -31,44 +31,68 @@ export const categoryRouter = createTRPCRouter({
     return categories;
   }),
 
+  // ========================CREATE========================
   createCategory: protectedProcedure
-  .input(
-    // input() bisa declare schema object, makanya digunakan zod(z) untuk memastikan tipe data sesuai(runtime type checker)
-    z.object({
-      name: z.string().min(3, "Minimum of 3 characters"),
+    .input(
+      // input() bisa declare schema object, makanya digunakan zod(z) untuk memastikan tipe data sesuai(runtime type checker)
+      z.object({
+        name: z.string().min(3, "Minimum of 3 characters"),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+
+      const newCategory = await db.category.create({
+        // Berdasarkan model category, cuman data name yg diisi manual, karena yg lain punya nilai default/auto generated
+        data: {
+          name: input.name
+        },
+        select: {
+          id: true,
+          name: true,
+          productCount: true,
+        }
+      });
+      
+      return newCategory;
     }),
-  )
-  .mutation(async ({ ctx, input }) => {
-    const { db } = ctx;
 
-    const newCategory = await db.category.create({
-      // Berdasarkan model category, cuman data name yg diisi manual, karena yg lain punya nilai default/auto generated
-      data: {
-        name: input.name
-      },
-      select: {
-        id: true,
-        name: true,
-        productCount: true,
-      }
-    });
-     
-    return newCategory;
-  }),
-
+  // ========================DELETE========================
   deleteCategoryById: protectedProcedure
-  .input(
-    z.object({
-      categoryId: z.string(),
-    }),
-  )
-  .mutation(async ({ ctx, input }) => {
-    const { db } = ctx;
+    .input(
+      z.object({
+        categoryId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
 
-    await db.category.delete({
-      where: {
-        id: input.categoryId,
-      },
-    });
-  }),
+      await db.category.delete({
+        where: {
+          id: input.categoryId,
+        },
+      });
+    }),
+
+  // ========================EDIT========================
+  editCategory: protectedProcedure
+    .input(
+      z.object({
+        categoryId: z.string(),
+        name: z.string().min(3, "Minimum of 3 characters"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+
+      await db.category.update({
+        where: {
+          id: input.categoryId,
+        },
+        data: {
+          name: input.name,
+        },
+      });
+    }),
+
 });

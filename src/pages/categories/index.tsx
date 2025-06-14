@@ -36,7 +36,9 @@ const CategoriesPage: NextPageWithLayout = () => {
     useState(false);
   const [editCategoryDialogOpen, setEditCategoryDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [categoryToEdit, setCategoryToEdit] = useState<string | null>(null);
 
+  // FORMS =====================================================================
   const createCategoryForm = useForm<CategoryFormSchema>({
     resolver: zodResolver(categoryFormSchema),
   });
@@ -45,40 +47,46 @@ const CategoriesPage: NextPageWithLayout = () => {
     resolver: zodResolver(categoryFormSchema),
   });
 
+  // QUERIES & MUTATIONS =========================================================
+  
+  // READ
   // function untuk mengambil data dari db
   // category diambil dari root.ts (createTRPCRouter)
   // data: categories, mengganti nama data menjadi categories
   const { data: categories, isLoading: categoriesIsLoading } = 
     api.category.getCategories.useQuery();
 
+    
+  // CREATE
   // function untuk mengambil data yg akan di input dri category.ts
   // mutate function untuk create category
   const { mutate: createCategory } = 
     api.category.createCategory.useMutation({
       // reflect perubahan/interaksi frontend sesuai
       onSuccess: async () => {
-        // 4. invalidate data (data yg skrng tdk valid, harus kasi yg baru)
         // promise jdi merupakan async 
+        await apiUtils.category.getCategories.invalidate(); // 4. invalidate data (data yg skrng tdk valid, harus kasi yg baru)
+        alert("Successfully created a new category"); // 1. berhasil buat kategori baru
+        setCreateCategoryDialogOpen(false); // 2. keluar dari modal saat di klik create
+        createCategoryForm.reset(); // 3. category name modal ke reset jdi 0
+      },
+    });
+  
+
+  // EDIT
+  const { mutate: editCategory } = 
+    api.category.editCategory.useMutation({
+      onSuccess: async () => {
         await apiUtils.category.getCategories.invalidate();
-        // 1. berhasil buat kategori baru
-        alert("Successfully created a new category");
-        // 2. keluar dari modal saat di klik create
-        setCreateCategoryDialogOpen(false);
-        // 3. category name modal ke reset jdi 0
-        createCategoryForm.reset();
+
+        alert("Successfully edited a new category");
+        setEditCategoryDialogOpen(false);
+        editCategoryForm.reset();  // 3. category name modal ke reset jdi 0
+        setCategoryToEdit(null);
       },
     });
 
-  // CategoryFormSchema untuk validasi form
-  const handleSubmitCreateCategory = (data: CategoryFormSchema) => {
-    createCategory({
-      // object diambil dari createCategory category.ts
-      name: data.name,
-    });
-    // alert(data.name)
-    // console.log(data);
-  };
-
+  // DELETE
   const { mutate: deleteCategoryById } = 
     api.category.deleteCategoryById.useMutation({
       onSuccess: async () => {
@@ -89,12 +97,33 @@ const CategoriesPage: NextPageWithLayout = () => {
       }
     });
 
-  const handleSubmitEditCategory = (data: CategoryFormSchema) => {
-    console.log(data);
+
+  // HANDLERS =====================================================
+  // Submit create
+  // CategoryFormSchema untuk validasi form
+  const handleSubmitCreateCategory = (data: CategoryFormSchema) => {
+    createCategory({
+      name: data.name, // object diambil dari createCategory category.ts
+    });
+    // alert(data.name)
+    // console.log(data);
   };
 
-  const handleClickEditCategory = (category: Category) => {
+  // Submit hasil edit
+  const handleSubmitEditCategory = (data: CategoryFormSchema) => {
+    // console.log(data);
+    if (!categoryToEdit) return;
+
+    editCategory({
+      name: data.name,
+      categoryId: categoryToEdit,
+    });
+  };
+
+  // Klik tombol edit
+  const handleClickEditCategory = (category: { id: string; name: string }) => {
     setEditCategoryDialogOpen(true);
+    setCategoryToEdit(category.id);
 
     editCategoryForm.reset({
       name: category.name,
@@ -108,11 +137,11 @@ const CategoriesPage: NextPageWithLayout = () => {
 
   // fungsi untuk konfirmasi delete
   const handleConfirmDeleteCategory = () => {
-    // karena categoryId harus string, sedangkan categoryToDelete bisa string bisa null
+    // karena nilai categoryId adalah string, sedangkan nilai categoryToDelete bisa string atau null
     if (!categoryToDelete) return;
 
     deleteCategoryById({
-      categoryId: categoryToDelete
+      categoryId: categoryToDelete,
     })
   };
 
@@ -168,6 +197,12 @@ const CategoriesPage: NextPageWithLayout = () => {
               key={category.id} 
               name={category.name} 
               productCount={category.productCount}
+              // tombol edit (handleClickEditCategory nerima type category= ada id, name, count)
+              onEdit={() => handleClickEditCategory({ 
+                  id: category.id, 
+                  name: category.name 
+                })
+              }
               // tombol delete
               onDelete={() => handleClickDeleteCategory(category.id)}
             />
