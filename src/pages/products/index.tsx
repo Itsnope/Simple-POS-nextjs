@@ -22,6 +22,7 @@ const ProductsPage: NextPageWithLayout = () => {
   const apiUtils = api.useUtils();
 
   // react useState digunakan untuk simpan data di suatu state
+  const [uploadedCreateProductImageUrl, setUploadedCreateProductImageUrl] = useState<string | null>(null);
   const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false);
 
 
@@ -30,6 +31,7 @@ const ProductsPage: NextPageWithLayout = () => {
 
   // CREATE FORM =============================================
     // useForm = Buat form yg type safety untuk data form sesuai ProductFormSchema.
+    // resolver = validasi form field
     // zodResolver = menghubungkan validasi zod(rulesnya) dgn react hook form(formnya).
   const createProductForm = useForm<ProductFormSchema>({
     resolver: zodResolver(productFormSchema),
@@ -60,10 +62,17 @@ const ProductsPage: NextPageWithLayout = () => {
   // HANDLERS ==================================================
   // CREATE HANDLE =============================================
   const handleSubmitCreateProduct = (values: ProductFormSchema) => {
+    // validasi imageUrl karena nilai uploadedCreateProductImageUrl yg bisa null
+    if (!uploadedCreateProductImageUrl) {
+      alert("Please upload a product image first");
+      return;
+    };
+
     createProducts({
       name: values.name,
       price: values.price,
       categoryId: values.categoryId,
+      imageUrl: uploadedCreateProductImageUrl,
     });
     // alert("create product");
     // alert("create product");
@@ -97,6 +106,12 @@ const ProductsPage: NextPageWithLayout = () => {
                 <ProductForm 
                   // Tidak digunakan secara langsung dialur create
                   onSubmit={handleSubmitCreateProduct}
+
+                  // Props onChangeImageUrl akan nge-trigger setUploadedCreateProductImageUrl untuk simpan imageUrl ke state.
+                    // imageUrl ter-set atau tersimpan ke state uploadedCreateProductImageUrl
+                  onChangeImageUrl={(imageUrl) => {
+                    setUploadedCreateProductImageUrl(imageUrl);
+                  }}
                 />
 
               </Form>
