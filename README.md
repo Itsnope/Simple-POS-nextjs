@@ -79,6 +79,15 @@ npm run dev
     - fix : Membuat fungsi CRUD categories aplikasi bisa sinkron dengan database.
 
 
+## Day 2
+- [x] Read product
+- [x] Create product
+- [ ] Include file uploads with signed URL
+- [ ] Forms -> RHF (React Hook Form)
+- [ ] Update product
+- [ ] Delete product
+- [ ] Filter product by category
+
 
 # Create T3 App
 
