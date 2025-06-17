@@ -2,7 +2,7 @@
 
 Proyek aplikasi kasir sederhana ini dibangun dengan Next.js, tRPC, Clerk (Authentication), Supabase (Database & Storage), Xendit (Payment Gateway).
 
-## Day 1 : Setup Project & CRUD Category
+## 🛠️ How Setup Project (WIP)
 
 ### 🚀 Persiapan awal
 
@@ -34,22 +34,48 @@ Proyek aplikasi kasir sederhana ini dibangun dengan Next.js, tRPC, Clerk (Authen
 ### 📂 Supabase Setup
 
 - Buat akun supabase di [https://supabase.com/](https://supabase.com/)
-- Klik **New Project** untuk membuat proyek baru
-- Di dashboard Supabase, klik proyek yang baru dibuat
-- Klik tombol **Connect** di kiri atas
-- Buka tab **ORMs**
-- Salin nilai connection string dari file .env.local:
-  - `DATABASE_URL`
-  - `DIRECT_URL`
-- Tempel nilai connection string tersebut ke dalam file `.env`:
-  ```bash
-  # Connect to Supabase via connection pooling
-  DATABASE_URL=your_supabase_connection_pooling_url
+- Klik **New Project** untuk membuat proyek baru (Pastikan pilih **Only Connection String** di bagian **SECURITY OPTIONS**).
+- Connection string :
+  - Di dashboard Supabase, klik proyek yang baru dibuat
+  - Klik tombol **Connect** di kiri atas
+  - Buka tab **ORMs**
+  - Salin nilai connection string dari file .env.local :
+    - `DATABASE_URL`
+    - `DIRECT_URL`
+  - Tempel nilai connection string tersebut ke dalam file `.env` :
+    ```bash
+    # Connect to Supabase via connection pooling
+    DATABASE_URL=your_supabase_connection_pooling_url
 
-  # Direct connection to the database. Used for migrations
-  DIRECT_URL=your_supabase_direct_connection_url
-  ```
-- Ganti `YOUR_PASSWORD` pada connection string dengan password database Anda (bisa dilihat di halaman Project Settings > Database)
+    # Direct connection to the database. Used for migrations
+    DIRECT_URL=your_supabase_direct_connection_url
+    ```
+  - Ganti `YOUR_PASSWORD` pada connection string dengan password database Anda (bisa dilihat di halaman Project Settings > Database).
+- Supabase anon & role key : 
+  - Kembali ke bagian **Connect**, buka tab **App Frameworks**.
+  - Sesuaikan bagian Framework ke Next.js dan Using ke Pages Router.
+  - Salin nilai berikut dari file `.env.local` :
+    - `NEXT_PUBLIC_SUPABASE_URL`
+    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - Tempel nilainya ke dalam file `.env` :
+    ```bash
+    NEXT_PUBLIC_SUPABASE_URL=your_NEXT_PUBLIC_SUPABASE_URL
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ```
+  - Buka **Project Settings > API Keys**.
+  - Reveal dan salin bagian `service_role`.
+  - Tempel nilainya ke dalam file `.env` :
+    ```bash
+    SUPABASE_ROLE_KEY=your_SUPABASE_ROLE_KEY
+    ```
+- Supabase Storage :
+  - Kembali ke dashboard project, lalu masuk ke bagian Storage.
+  - Klik **New bucket** untuk membuat bucket baru.
+  - Ketikkan nama bucket `product-images` dan centang bagian **Public bucket**.
+  - klik bagian **Additional configuration** dan centang **Restrict file upload size for bucket**.
+  - Isi ukuran upload menjadi 10 MB.
+  - Ketik `images/*` di bagian **Allowed MIME types**.
+  - Klik **Save** untuk menyimpan bucket.
 
 ### ▶️ Jalankan Proyek
 
@@ -60,30 +86,24 @@ npm run db:push
 npm run dev
 ```
 
+## 📅 Daily Notes
 
-### 📝 List file changes day 1
+### Day 1 : Setup Project & CRUD Category
+[Day1 - Documentation](https://github.com/Itsnope/Simple-POS-nextjs/blob/main/docs/Day1.md)
 
-- Setup Project : 
-  - `.env`  
-  Mendefinisikan variabel lokal.
-  - `schema.prisma`  
-  Mendefinisikan skema database dan model data aplikasi Anda.
-- CRUD Category :
-  - `src/server/api/routers/category.ts`  
-  Mendefinisikan semua endpoint API (prosedur tRPC) yang spesifik untuk melakukan operasi CRUD pada entitas Kategori.
-  - `src/server/api/root.ts`  
-  Merupakan file inti yang menggabungkan semua router tRPC di backend.
-    - fix : Membuat API kategori dapat digunakan oleh frontend.
-  - `src/pages/categories/index.tsx`  
-  Merupakan titik masuk (entry point) atau halaman utama untuk rute /categories (halaman utama kategori).
-    - fix : Membuat fungsi CRUD categories aplikasi bisa sinkron dengan database.
+- [x] Setup project NextJS, tRPC, Clerk, Supabase Storage
+- [x] flow dasar project
+- [x] Setup database schemas
+- [x] CRUD Categories
 
 
-## Day 2
-- [x] Read product
+### Day 2 : Read & Create Product
+[Day2 - Documentation](https://github.com/Itsnope/Simple-POS-nextjs/blob/main/docs/Day2.md)
+
 - [x] Create product
-- [ ] Include file uploads with signed URL
-- [ ] Forms -> RHF (React Hook Form)
+- [x] Read product
+- [x] Include file uploads with signed URL
+- [x] Forms -> RHF (React Hook Form)
 - [ ] Update product
 - [ ] Delete product
 - [ ] Filter product by category

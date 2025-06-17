@@ -152,7 +152,7 @@ const ProductsPage: NextPageWithLayout = () => {
                 key={product.id}
                 name={product.name}
                 price={product.price}
-                image={product.imageUrl ?? ""}
+                image={product.imageUrl ?? "https://placehold.co/600x400"}
                 category={product.category.name}
               />
             );
