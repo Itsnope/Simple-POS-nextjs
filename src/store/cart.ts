@@ -40,15 +40,31 @@ export const useCartStore = create<CartState>()((set) => ({
       
       // a. Kita salin dulu isi keranjang saat ini ke variabel duplicateItems.
       const duplicateItems = [...currentState.items];
+
+      // findIndex => cari index item dlm array dgn kondisi tertentu (id produk)
+      const existingItemIndex = duplicateItems.findIndex(item => item.productId === newItem.productId); 
       
-      // b. Setelah itu, kita masukkan barang baru ke duplicateItems, dengan jumlah (quantity) 1.
-      duplicateItems.push({
-        productId: newItem.productId,
-        name: newItem.name,
-        price: newItem.price,
-        imageUrl: newItem.imageUrl,
-        quantity: 1,
-      })
+      // Item belum ada di cart
+      if (existingItemIndex === -1) {
+        // b. Setelah itu, kita masukkan barang baru ke duplicateItems, dengan jumlah (quantity) 1.
+        duplicateItems.push({
+          productId: newItem.productId,
+          name: newItem.name,
+          price: newItem.price,
+          imageUrl: newItem.imageUrl,
+          quantity: 1,
+        });
+      } else {
+        const itemToUpdate = duplicateItems[existingItemIndex];
+
+        if (!itemToUpdate) 
+          return {
+            ...currentState,
+          };
+
+        itemToUpdate.quantity += 1;
+      }
+
 
       // c. Terakhir, kita kembalikan state baru dengan isi keranjang yang sudah diperbarui.
       return {
