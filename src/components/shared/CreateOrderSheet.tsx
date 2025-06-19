@@ -21,20 +21,22 @@ import {
   SheetTitle,
 } from "../ui/sheet";
 import { PaymentQRCode } from "./PaymentQrCode";
+import { useCartStore } from "@/store/cart";
 
 type OrderItemProps = {
   id: string;
   name: string;
   price: number;
   quantity: number;
+  imageUrl: string;
 };
 
-const OrderItem = ({ id, name, price, quantity }: OrderItemProps) => {
+const OrderItem = ({ id, name, price, quantity, imageUrl }: OrderItemProps) => {
   return (
     <div className="flex gap-3" key={id}>
       <div className="relative aspect-square h-20 shrink-0 overflow-hidden rounded-xl">
         <Image
-          src={PRODUCTS.find((p) => p.id === id)?.image ?? ""}
+          src={imageUrl}
           alt={name}
           fill
           unoptimized
@@ -79,6 +81,9 @@ export const CreateOrderSheet = ({
   open,
   onOpenChange,
 }: CreateOrderSheetProps) => {
+  // Global variable cart.ts
+  const cartStore = useCartStore();
+
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [paymentInfoLoading, setPaymentInfoLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -115,6 +120,20 @@ export const CreateOrderSheet = ({
             <h1 className="text-xl font-medium">Order Items</h1>
             <div className="flex flex-col gap-6">
               {/* Map order items here */}
+              {
+                cartStore.items.map(item => {
+                  return (
+                    <OrderItem 
+                      key={item.productId} 
+                      id={item.productId} 
+                      name={item.name} 
+                      price={item.price} 
+                      imageUrl={item.imageUrl} 
+                      quantity={item.quantity}
+                    />
+                  )
+                })
+              }
             </div>
           </div>
 
