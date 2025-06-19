@@ -88,8 +88,13 @@ export const CreateOrderSheet = ({
   const [paymentInfoLoading, setPaymentInfoLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  const subtotal = 100000;
-  const tax = useMemo(() => subtotal * 0.17, [subtotal]);
+  // const subtotal = 100000; 
+  // a = akumulator (sesuai iterasi, awal biasa = 0), b = currentValue
+  const subtotal = cartStore.items.reduce((a, b) => { 
+    return a + b.price * b.quantity; 
+  }, 0);
+  // useMemo() = me-recalculate saat subtotal berubah, tdk render ulang tiap perubahan
+  const tax = useMemo(() => subtotal * 0.1, [subtotal]);
   const grandTotal = useMemo(() => subtotal + tax, [subtotal, tax]);
 
   const handleCreateOrder = () => {
