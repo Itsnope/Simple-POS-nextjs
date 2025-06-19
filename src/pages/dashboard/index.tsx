@@ -15,8 +15,13 @@ import { useMemo, useState } from "react";
 import type { NextPageWithLayout } from "../_app";
 import { Button } from "@/components/ui/button";
 import { api } from "@/utils/api";
+import { useCartStore } from "@/store/cart";
 
 const DashboardPage: NextPageWithLayout = () => {
+
+  // Variabel global dri cart.ts
+  const cartStore = useCartStore();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [orderSheetOpen, setOrderSheetOpen] = useState(false);
@@ -49,7 +54,8 @@ const DashboardPage: NextPageWithLayout = () => {
       <DashboardHeader>
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <DashboardTitle>Dashboard</DashboardTitle>
+            {/* Cek panjang array items (harusnya 5) */}
+            <DashboardTitle>Dashboard {cartStore.items.length}</DashboardTitle>
             <DashboardDescription>
               Welcome to your Simple POS system dashboard.
             </DashboardDescription>
