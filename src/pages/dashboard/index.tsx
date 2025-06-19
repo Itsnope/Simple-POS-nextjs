@@ -34,7 +34,25 @@ const DashboardPage: NextPageWithLayout = () => {
     setSelectedCategory(categoryId);
   };
 
-  const handleAddToCart = (productId: string) => {};
+  const handleAddToCart = (productId: string) => {
+    // cartStore.addToCart();
+
+    // Mencari dan mengambil objek produk dari array products yang memiliki id sama dengan nilai productId(yg di card).
+    const productToAdd = products?.find(product => product.id === productId);
+
+    if (!productToAdd) {
+      alert("Product not found");
+      return;
+    };
+
+    // 4 properti ini akan dikirim ke fungsi addToCart dari cart.ts
+    cartStore.addToCart({
+      name: productToAdd.name,
+      productId: productToAdd.id,
+      imageUrl: productToAdd.imageUrl ?? "https://placehold.co/600x400",
+      price: productToAdd.price,
+    });
+  };
 
   // const filteredProducts = useMemo(() => {
   //   return PRODUCTS.filter((product) => {
@@ -54,19 +72,23 @@ const DashboardPage: NextPageWithLayout = () => {
       <DashboardHeader>
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            {/* Cek panjang array items (harusnya 5) */}
             <DashboardTitle>Dashboard {cartStore.items.length}</DashboardTitle>
             <DashboardDescription>
               Welcome to your Simple POS system dashboard.
             </DashboardDescription>
           </div>
-
-          <Button
-            className="animate-in slide-in-from-right"
-            onClick={() => setOrderSheetOpen(true)}
-          >
-            <ShoppingCart /> Cart
-          </Button>
+          
+          {/* Kalau items.length > 0 atau items itu ada nilai maka setorderSheetOpen true (tombol cart muncul) */}
+          {
+            !!cartStore.items.length && (
+              <Button
+                className="animate-in slide-in-from-right"
+                onClick={() => setOrderSheetOpen(true)}
+              >
+                <ShoppingCart /> Cart
+              </Button>
+            )
+          }
         </div>
       </DashboardHeader>
 
