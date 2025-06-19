@@ -14,11 +14,16 @@ import type { ReactElement } from "react";
 import { useMemo, useState } from "react";
 import type { NextPageWithLayout } from "../_app";
 import { Button } from "@/components/ui/button";
+import { api } from "@/utils/api";
 
 const DashboardPage: NextPageWithLayout = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [orderSheetOpen, setOrderSheetOpen] = useState(false);
+
+  // Mengambil data kategori dan produk dari API menggunakan React Query
+  const { data: categories } = api.category.getCategories.useQuery();
+  const { data: products } = api.product.getProducts.useQuery();
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -26,18 +31,18 @@ const DashboardPage: NextPageWithLayout = () => {
 
   const handleAddToCart = (productId: string) => {};
 
-  const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
-      const categoryMatch =
-        selectedCategory === "all" || product.category === selectedCategory;
+  // const filteredProducts = useMemo(() => {
+  //   return PRODUCTS.filter((product) => {
+  //     const categoryMatch =
+  //       selectedCategory === "all" || product.category === selectedCategory;
 
-      const searchMatch = product.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+  //     const searchMatch = product.name
+  //       .toLowerCase()
+  //       .includes(searchQuery.toLowerCase());
 
-      return categoryMatch && searchMatch;
-    });
-  }, [selectedCategory, searchQuery]);
+  //     return categoryMatch && searchMatch;
+  //   });
+  // }, [selectedCategory, searchQuery]);
 
   return (
     <>
@@ -71,11 +76,12 @@ const DashboardPage: NextPageWithLayout = () => {
         </div>
 
         <div className="flex space-x-4 overflow-x-auto pb-2">
-          {CATEGORIES.map((category) => (
+          {categories?.map((category) => (
             <CategoryFilterCard
+              // key digunakan react untuk identifikasi elemen dalam list (biar list bisa di render)
               key={category.id}
               name={category.name}
-              productCount={category.count}
+              productCount={category.productCount}
               isSelected={selectedCategory === category.id}
               onClick={() => handleCategoryClick(category.id)}
             />
@@ -83,6 +89,24 @@ const DashboardPage: NextPageWithLayout = () => {
         </div>
 
         <div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {products?.map((product) => (
+              <ProductMenuCard
+                // key digunakan react untuk identifikasi elemen dalam list (biar list bisa di render)
+                key={product.id}
+                productId={product.id}
+                name={product.name}
+                price={product.price}
+
+                // imageUrl cmn terima string, tapi product.imageUrl bisa null/string. Jadi, perlu nilai kedua yg PASTI string.
+                imageUrl={product.imageUrl ?? "https://placehold.co/600x400" }
+                onAddToCart={handleAddToCart}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* <div>
           {filteredProducts.length === 0 ? (
             <div className="my-8 flex flex-col items-center justify-center">
               <p className="text-muted-foreground text-center">
@@ -100,7 +124,8 @@ const DashboardPage: NextPageWithLayout = () => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
+
       </div>
 
       <CreateOrderSheet
