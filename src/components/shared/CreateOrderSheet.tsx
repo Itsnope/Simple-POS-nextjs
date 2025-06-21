@@ -22,6 +22,7 @@ import {
 } from "../ui/sheet";
 import { PaymentQRCode } from "./PaymentQrCode";
 import { useCartStore } from "@/store/cart";
+import { api } from "@/utils/api";
 
 type OrderItemProps = {
   id: string;
@@ -97,13 +98,27 @@ export const CreateOrderSheet = ({
   const tax = useMemo(() => subtotal * 0.1, [subtotal]);
   const grandTotal = useMemo(() => subtotal + tax, [subtotal, tax]);
 
-  const handleCreateOrder = () => {
-    setPaymentDialogOpen(true);
-    setPaymentInfoLoading(true);
+  const { mutate: createOrder } = api.order.createOrder.useMutation({
+    onSuccess: () => {
+      alert("created order")
+    }
+  });
 
-    setTimeout(() => {
-      setPaymentInfoLoading(false);
-    }, 3000);
+  const handleCreateOrder = () => {
+    createOrder({
+      orderItems: cartStore.items.map(item => {
+        return {
+          productId: item.productId,
+          quantity: item.quantity,
+        }
+      })
+    });
+    // setPaymentDialogOpen(true);
+    // setPaymentInfoLoading(true);
+
+    // setTimeout(() => {
+    //   setPaymentInfoLoading(false);
+    // }, 3000);
   };
 
   const handleRefresh = () => {

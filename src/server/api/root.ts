@@ -2,6 +2,7 @@ import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { categoryRouter } from "./routers/category";
 import { productRouter } from "./routers/product";
+import { orderRouter } from "./routers/order";
 
 /**
  * This is the primary router for your server.
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
   // method category untuk ngeroute category.ts ke createtrpcrouter utama (appRouter)
   category: categoryRouter,
   product: productRouter,
+  order: orderRouter,
 });
 
 // export type definition of API

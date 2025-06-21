@@ -39,9 +39,51 @@ model Product {
 
     // foreign key prisma
     // shift+alt+f = format(men-set @relation)
-    category Category @relation(fields: [categoryId], references: [id])
+    category   Category @relation(fields: [categoryId], references: [id])
     categoryId String
 
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+    createdAt  DateTime    @default(now())
+    updatedAt  DateTime    @updatedAt
+    OrderItems OrderItem[]
+}
+
+model Order {
+    id String @id @default(uuid())
+
+    subtotal   Int
+    tax        Int
+    grandTotal Int
+
+    // Payment gateway fields
+    externalTransactionId String?
+    paymentMethodId       String?
+
+    status OrderStatus @default(AWAITING_PAYMENT)
+
+    paidAt    DateTime?
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
+    OrderItems OrderItem[]
+}
+
+// status di prisma harus pakai enum
+enum OrderStatus {
+    AWAITING_PAYMENT
+    PROCESSING
+    DONE
+}
+
+model OrderItem {
+    id        String @id @default(uuid())
+    productId String
+    orderId   String
+
+    // shift + alt + f
+    product Product @relation(fields: [productId], references: [id])
+    order   Order   @relation(fields: [orderId], references: [id])
+
+    // price dipisah dari field product untuk catat price ketika transaksi saja (misal krn diskon).
+    // Contoh: harga produk berubah setelah transaksi, data order tetap konsisten.
+    price    Int
+    quantity Int
 }
