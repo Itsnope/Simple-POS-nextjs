@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createQRIS } from "@/server/xendit";
+import { addMinutes } from "date-fns";
 
 export const orderRouter = createTRPCRouter({
   createOrder: protectedProcedure
@@ -75,9 +77,28 @@ export const orderRouter = createTRPCRouter({
       }),
     });
 
+    const paymentRequest = await createQRIS({
+      amount: grandTotal,
+      orderId: order.id,
+      // expiresAt: addMinutes(new Date(), 1), // default value 15 menit di xendit.ts
+    })
+
+    await db.order.update({
+      where :{
+        id: order.id,
+      },
+      data: {
+        // tracking pembayaran
+        externalTransactionId: paymentRequest.id,
+        // simulasikan pembayaran
+        paymentMethodId: paymentRequest.paymentMethod.id,
+      },
+    });
+
     return {
       order,
       newOrderItems,
+      qrString: paymentRequest.paymentMethod.qrCode?.channelProperties?.qrString,
     };
 
   }),
