@@ -77,6 +77,21 @@ Proyek aplikasi kasir sederhana ini dibangun dengan Next.js, tRPC, Clerk (Authen
   - Ketik `images/*` di bagian **Allowed MIME types**.
   - Klik **Save** untuk menyimpan bucket.
 
+### 💱 Xendit Setup
+- Buat akun Xendit di [https://www.xendit.co/id/](https://www.xendit.co/id/)
+  - Tidak perlu verifikasi bisnis kalau hanya untuk development.
+- Dari dashboard Xendit, cari dan klik **Settings**.
+- Pada bagian **Developers** klik **API Keys**.
+- Pada bagian **Secret keys** klik **Generate secret key**.
+- Isi bagian **API key name**.
+- Pada bagian **Permissions/Money-in products** pilih **Write**.
+- Klik **Generate key**.
+- Salin nilai `Secret API Key` hasil generate.
+- Tempel nilainya ke dalam file `.env` :
+  ```bash
+  XENDIT_MONEY_IN_KEY=YOUR_XENDIT_MONEY_IN_KEY
+  ```
+
 ### ▶️ Jalankan Proyek
 
 Setelah semua variabel lingkungan diatur, jalankan perintah berikut:
@@ -107,6 +122,16 @@ npm run dev
 - [ ] Update product
 - [ ] Delete product
 - [ ] Filter product by category
+
+
+### Day 3 : Cart & payment
+[Day3 - Documentation](https://github.com/Itsnope/Simple-POS-nextjs/blob/main/docs/Day3.md)
+
+- [x] Filter product by category
+- [x] Add to cart (global state zustand)
+- [x] Generate QRIS (Xendit)
+- [ ] Handle Payment (webhook -> NGROK | Localtunnel)
+
 
 
 # Create T3 App
