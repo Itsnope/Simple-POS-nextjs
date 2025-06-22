@@ -107,14 +107,19 @@ export const CreateOrderSheet = ({
   });
 
   const handleCreateOrder = () => {
-    createOrder({
-      orderItems: cartStore.items.map(item => {
-        return {
-          productId: item.productId,
-          quantity: item.quantity,
-        }
-      })
-    });
+    if (grandTotal <= 10000000) {
+      createOrder({
+        orderItems: cartStore.items.map(item => {
+          return {
+            productId: item.productId,
+            quantity: item.quantity,
+          }
+        })
+      });
+    } else {
+      // QRIS hanya support transaksi dibawah 10 juta
+      alert("Transaksi harus kurang Rp10.000.000");
+    }
     // setPaymentDialogOpen(true);
     // setPaymentInfoLoading(true);
 
