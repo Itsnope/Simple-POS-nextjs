@@ -18,6 +18,7 @@ type AddToCartItem = Omit<CartItem, "quantity">
 interface CartState {
   items: CartItem[];
   addToCart: (newItem: AddToCartItem) => void;
+  clearCart: () => void;
 }
 
 // useCartStore adalah hook yang digunakan untuk mengakses dan memodifikasi state cart/keranjang.
@@ -76,4 +77,14 @@ export const useCartStore = create<CartState>()((set) => ({
     // alert(newItem.name);
     // alert("Item added to cart");
   },
+
+  clearCart: () => {
+    set((currentState) => {
+      return {
+        ...currentState,
+        items: [],
+      };
+    });
+  },
+
 }));

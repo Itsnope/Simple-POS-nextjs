@@ -87,7 +87,7 @@ export const CreateOrderSheet = ({
 
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [paymentInfoLoading, setPaymentInfoLoading] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  // const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   // const subtotal = 100000; 
   // a = akumulator (sesuai iterasi, awal biasa = 0), b = currentValue
@@ -113,6 +113,24 @@ export const CreateOrderSheet = ({
     },
   });
 
+  // mutation payment status
+  const { 
+    mutate: checkOrderPaymentStatus, 
+    data: orderPaid, 
+    // mutation lagi loading
+    isPending: checkOrderPaymentStatusIsPending, 
+    // reset mutate biar data bisa ke reset ke 0
+    reset: resetCheckOrderPaymentStatus,
+  } = api.order.checkOrderPaymentStatus.useMutation({
+    // saat status payment sukses/dibayar, maka cartstore akan kosong.
+    onSuccess: (orderPaidResponse) => {
+      if (orderPaidResponse) {
+        cartStore.clearCart();
+        return;
+      }
+    },
+  });
+
   const handleCreateOrder = () => {
     if (grandTotal <= 10000000) {
       createOrder({
@@ -135,8 +153,13 @@ export const CreateOrderSheet = ({
     // }, 3000);
   };
 
+  // Check payment status
   const handleRefresh = () => {
-    setPaymentSuccess(true);
+    if (!createOrderResponse) return;
+
+    checkOrderPaymentStatus({
+      orderId: createOrderResponse?.order.id,
+    });
   };
 
   // Simulate payment button
@@ -146,6 +169,13 @@ export const CreateOrderSheet = ({
     simulatePayment({
       orderId: createOrderResponse?.order.id,
     })
+  };
+
+  // Reset orderpaid status
+  const handleClosePaymentDialog = () => {
+    setPaymentDialogOpen(false);
+    onOpenChange(false);
+    resetCheckOrderPaymentStatus();
   };
 
   return (
@@ -221,11 +251,21 @@ export const CreateOrderSheet = ({
               </div>
             ) : (
               <>
-                <Button variant="link" onClick={handleRefresh}>
-                  Refresh
-                </Button>
 
-                {!paymentSuccess ? (
+                {!orderPaid && (
+                  <Button 
+                    variant="link" 
+                    onClick={handleRefresh} 
+                    disabled={checkOrderPaymentStatusIsPending}
+                  >
+                    { checkOrderPaymentStatusIsPending 
+                      ? "Refreshing..." 
+                      : "Refresh" 
+                    }
+                  </Button>
+                )}
+
+                {!orderPaid ? (
                   // qr-string
                   <PaymentQRCode qrString={createOrderResponse?.qrString ?? ""} />
                 ) : (
@@ -240,21 +280,23 @@ export const CreateOrderSheet = ({
                   Transaction ID: {createOrderResponse?.order.id}
                 </p>
 
-                <Button onClick={handelSimulatePayment} variant="link" >Simulate Payment</Button>
+                { !orderPaid && (
+                  <Button onClick={handelSimulatePayment} variant="link" >Simulate Payment</Button>
+                )}
+
               </>
             )}
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel asChild>
-              <Button
-                disabled={paymentInfoLoading}
-                variant="outline"
-                className="w-full"
-              >
-                Done
-              </Button>
-            </AlertDialogCancel>
+            <Button
+              disabled={paymentInfoLoading}
+              variant="outline"
+              className="w-full"
+              onClick={handleClosePaymentDialog}
+            >
+              Done
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

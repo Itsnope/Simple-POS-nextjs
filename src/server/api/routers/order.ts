@@ -143,4 +143,33 @@ export const orderRouter = createTRPCRouter({
       });
       
     }),
+
+  checkOrderPaymentStatus: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string().uuid(),
+      })
+    )
+    // Using mutation biar bisa trigger manual (Bukan best practice, fetch pakai mutation)
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+      
+      const order = await db.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        select: {
+          paidAt: true,
+          status: true,
+        },
+      });
+
+      // payment status belum/blm bayar
+      if (!order?.paidAt) {
+        return false;
+      };
+
+      return true;
+    }),
+
 });
