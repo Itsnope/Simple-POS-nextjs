@@ -106,6 +106,13 @@ export const CreateOrderSheet = ({
     }
   });
 
+  // mutation simulate payment
+  const { mutate: simulatePayment } = api.order.simulatePayment.useMutation({
+    onSuccess: () => {
+      alert("Simulated payment");
+    },
+  });
+
   const handleCreateOrder = () => {
     if (grandTotal <= 10000000) {
       createOrder({
@@ -130,6 +137,15 @@ export const CreateOrderSheet = ({
 
   const handleRefresh = () => {
     setPaymentSuccess(true);
+  };
+
+  // Simulate payment button
+  const handelSimulatePayment = () => {
+    if (!createOrderResponse) return;
+
+    simulatePayment({
+      orderId: createOrderResponse?.order.id,
+    })
   };
 
   return (
@@ -223,6 +239,8 @@ export const CreateOrderSheet = ({
                   {/* id transaksi */}
                   Transaction ID: {createOrderResponse?.order.id}
                 </p>
+
+                <Button onClick={handelSimulatePayment} variant="link" >Simulate Payment</Button>
               </>
             )}
           </div>
