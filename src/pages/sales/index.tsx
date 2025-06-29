@@ -4,15 +4,21 @@ import {
   DashboardLayout,
   DashboardTitle,
 } from "@/components/layouts/DashboardLayout";
-import { OrderCard, type Order } from "@/components/OrderCard";
+import { OrderCard } from "@/components/OrderCard";
 import type { NextPageWithLayout } from "../_app";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { api } from "@/utils/api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { OrderStatus } from "@prisma/client";
 
 const SalesPage: NextPageWithLayout = () => {
+
+  const [filterOrder, setFilterOrder] = useState<OrderStatus | "ALL">("ALL");
   
-  const { data: orders } = api.order.getOrders.useQuery();
+  const { data: orders } = api.order.getOrders.useQuery({
+    status: filterOrder, // saat state berubah, auto refetch dengan value terbaru
+  });
 
   // const [orders, setOrders] = useState<Order[]>([
   //   {
@@ -53,6 +59,11 @@ const SalesPage: NextPageWithLayout = () => {
   //   }
   // ]);
 
+
+  const handleFilterOrderChange = (value: OrderStatus | "ALL") => {
+    setFilterOrder(value);
+  };
+
   const handleFinishOrder = (orderId: string) => {
     // setOrders(prevOrders =>
     //   prevOrders.map(order =>
@@ -90,7 +101,30 @@ const SalesPage: NextPageWithLayout = () => {
       </div>
 
       <div className="rounded-lg border p-6">
-        <h3 className="text-lg font-medium mb-4">Orders</h3>
+        <div className="flex justify-between">
+          <h3 className="text-lg font-medium mb-4">Orders</h3>
+
+          <Select defaultValue="ALL" onValueChange={handleFilterOrderChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent align="end">
+              <SelectItem value="ALL">ALL</SelectItem>
+              {
+                // ambil isi/value OrderStatus jadi array terus di mapping
+                Object.keys(OrderStatus).map((orderStatus) => {
+                  return (
+                    <SelectItem key={orderStatus} value={orderStatus}>
+                      {/* @ts-expect-error will fix type later */}
+                      {OrderStatus[orderStatus]}
+                    </SelectItem>
+                  )
+                })
+              }
+            </SelectContent>
+          </Select>
+        </div>
         
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {orders?.map((order) => (

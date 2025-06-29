@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { createQRIS, xenditPaymentMethodClient } from "@/server/xendit";
 import { addMinutes } from "date-fns";
 import { TRPCError } from "@trpc/server";
+import { OrderStatus, Prisma } from "@prisma/client";
 
 export const orderRouter = createTRPCRouter({
   createOrder: protectedProcedure
@@ -172,26 +173,49 @@ export const orderRouter = createTRPCRouter({
       return true;
     }),
 
-  getOrders: protectedProcedure.query(async ({ ctx }) => {
-    const { db } = ctx;
+  getOrders: protectedProcedure
+    .input(
+      z.object({
+        // ambil keys OrderStatus(done dkk) jadi array terus di spread/buka biar masuk ke dalam array si enum
+        status: z.enum(["ALL", ...Object.keys(OrderStatus)]),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
 
-    const orders = await db.order.findMany({
-      select: {
-        id: true,
-        grandTotal: true,
-        status: true,
-        paidAt: true,
-        
-        // Dapatkan total items berdasarkan orders
-        _count: {
-          select: {
-            OrderItems: true,
+      // Objek kosong yg dipasang ke where order.findmany
+      const whereClause: Prisma.OrderWhereInput = {};
+
+      switch (input.status) {
+        case OrderStatus.AWAITING_PAYMENT:
+          whereClause.status = OrderStatus.AWAITING_PAYMENT;
+          break;
+        case OrderStatus.PROCESSING:
+          whereClause.status = OrderStatus.PROCESSING;
+          break;
+        case OrderStatus.DONE:
+          whereClause.status = OrderStatus.DONE;
+          break;
+      };
+
+      const orders = await db.order.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          grandTotal: true,
+          status: true,
+          paidAt: true,
+          
+          // Dapatkan total items berdasarkan orders
+          _count: {
+            select: {
+              OrderItems: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return orders;
-  }),
+      return orders;
+    }),
 
 });
