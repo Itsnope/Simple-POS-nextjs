@@ -172,4 +172,26 @@ export const orderRouter = createTRPCRouter({
       return true;
     }),
 
+  getOrders: protectedProcedure.query(async ({ ctx }) => {
+    const { db } = ctx;
+
+    const orders = await db.order.findMany({
+      select: {
+        id: true,
+        grandTotal: true,
+        status: true,
+        paidAt: true,
+        
+        // Dapatkan total items berdasarkan orders
+        _count: {
+          select: {
+            OrderItems: true,
+          },
+        },
+      },
+    });
+
+    return orders;
+  }),
+
 });
