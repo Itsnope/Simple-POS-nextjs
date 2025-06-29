@@ -218,4 +218,62 @@ export const orderRouter = createTRPCRouter({
       return orders;
     }),
 
+  finishOrder: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string().uuid(),
+      })
+    )    
+    .mutation(async ({ ctx, input }) => {
+      const { db } = ctx;
+
+      // processing -> done
+      // ORDER HARUS SUDAH DI BAYAR
+
+      const order = await db.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        select: {
+          paidAt: true,
+          status: true,
+          id: true,
+        }
+      });
+
+      // console.log(order?.status);
+
+      // Validasi dlu
+      if (!order) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: "order not found",
+        });
+      };
+
+      if(!order.paidAt) {
+        throw new TRPCError({
+          code: "UNPROCESSABLE_CONTENT",
+          message: "order is not paid yet",
+        });
+      };
+
+      if (order.status !== OrderStatus.PROCESSING) {
+        throw new TRPCError({
+          code: "UNPROCESSABLE_CONTENT",
+          message: "order is not processing yet",
+        });
+      };
+
+      return await db.order.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: OrderStatus.DONE,
+        },
+      });
+
+    }),
+
 });

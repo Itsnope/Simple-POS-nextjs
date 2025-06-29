@@ -13,12 +13,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { OrderStatus } from "@prisma/client";
 
 const SalesPage: NextPageWithLayout = () => {
+  const apiUtils = api.useUtils();
 
   const [filterOrder, setFilterOrder] = useState<OrderStatus | "ALL">("ALL");
   
   const { data: orders } = api.order.getOrders.useQuery({
     status: filterOrder, // saat state berubah, auto refetch dengan value terbaru
   });
+
+  const { mutate: finishOrder, isPending: finishOrderIsPending, variables: finishOrderVariables } = 
+    api.order.finishOrder.useMutation({
+      onSuccess: async () => {
+        // Krna ada pembaharuan data, jgn lupa update/invalidate ke data hasil pembaharuan
+          // krna usequery menerima status, maka kita bisa tentukan apa yg di invalidate.
+        await apiUtils.order.getOrders.invalidate();
+
+        alert("Finished order");
+      },
+    });
 
   // const [orders, setOrders] = useState<Order[]>([
   //   {
@@ -65,6 +77,9 @@ const SalesPage: NextPageWithLayout = () => {
   };
 
   const handleFinishOrder = (orderId: string) => {
+    finishOrder({
+      orderId,
+    });
     // setOrders(prevOrders =>
     //   prevOrders.map(order =>
     //     order.id === orderId
@@ -135,6 +150,7 @@ const SalesPage: NextPageWithLayout = () => {
               totalItems={order._count.OrderItems}
               status={order.status}
               onFinishOrder={handleFinishOrder}
+              isFinishingOrder={finishOrderIsPending && order.id === finishOrderVariables.orderId}
             />
           ))}
         </div>

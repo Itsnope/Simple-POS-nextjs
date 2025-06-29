@@ -19,13 +19,14 @@ interface OrderCardProps {
   status: OrderStatus;
 
   onFinishOrder?: (orderId: string) => void;
+  isFinishingOrder?: boolean;
 }
 
-export const OrderCard = ({ id, totalAmount, totalItems, status, onFinishOrder }: OrderCardProps) => {
+export const OrderCard = ({ id, totalAmount, totalItems, status, isFinishingOrder, onFinishOrder }: OrderCardProps) => {
   const handleFinishOrder = () => {
-    // if (onFinishOrder) {
-    //   onFinishOrder(id);
-    // }
+    if (onFinishOrder) {
+      onFinishOrder(id);
+    }
   };
 
   // Untuk 3 kondisi OrderStatus
@@ -70,8 +71,9 @@ export const OrderCard = ({ id, totalAmount, totalItems, status, onFinishOrder }
           onClick={handleFinishOrder}
           className="w-full"
           size="sm"
+          disabled={isFinishingOrder}
         >
-          Finish Order
+          {isFinishingOrder ? "Processing..." : "Finish Order"}
         </Button>
       )}
     </div>
