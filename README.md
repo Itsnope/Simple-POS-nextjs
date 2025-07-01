@@ -78,19 +78,42 @@ Proyek aplikasi kasir sederhana ini dibangun dengan Next.js, tRPC, Clerk (Authen
   - Klik **Save** untuk menyimpan bucket.
 
 ### 💱 Xendit Setup
-- Buat akun Xendit di [https://www.xendit.co/id/](https://www.xendit.co/id/)
-  - Tidak perlu verifikasi bisnis kalau hanya untuk development.
-- Dari dashboard Xendit, cari dan klik **Settings**.
-- Pada bagian **Developers** klik **API Keys**.
-- Pada bagian **Secret keys** klik **Generate secret key**.
-- Isi bagian **API key name**.
-- Pada bagian **Permissions/Money-in products** pilih **Write**.
-- Klik **Generate key**.
-- Salin nilai `Secret API Key` hasil generate.
-- Tempel nilainya ke dalam file `.env` :
-  ```bash
-  XENDIT_MONEY_IN_KEY=YOUR_XENDIT_MONEY_IN_KEY
-  ```
+- Buat akun Xendit di [https://www.xendit.co/id/](https://www.xendit.co/id/).  
+(Tidak perlu verifikasi bisnis kalau hanya untuk development.)
+- Xendit secret API key :
+  - Dari dashboard Xendit, cari dan klik **Settings**.
+  - Pada bagian **Developers** klik **API Keys**.
+  - Pada bagian **Secret keys** klik **Generate secret key**.
+  - Isi bagian **API key name**.
+  - Pada bagian **Permissions/Money-in products** pilih **Write**.
+  - Klik **Generate key**.
+  - Salin nilai `Secret API Key` hasil generate.
+  - Tempel nilainya ke dalam file `.env` :
+    ```bash
+    XENDIT_MONEY_IN_KEY=YOUR_XENDIT_MONEY_IN_KEY
+    ```
+- Xendit webhook token :
+  - Kembali ke **Settings** > **Developers** klik **Webhooks**.
+  - Klik **🔒 View Webhook verification token**, verifikasi password, kemudian klik **Copy** untuk menyalin token.
+  - Tempel nilainya ke dalam file `.env` :
+    ```bash
+    XENDIT_WEBHOOK_TOKEN=YOUR_XENDIT_WEBHOOK_TOKEN
+    ```
+
+
+### Ngrok Setup
+- Buat akun ngrok di [https://ngrok.com/](https://ngrok.com/)
+- Download `ngrok.exe` dari website ngrok.
+- Tambahkan `ngrok.exe` ke **System Variable PATH** agar bisa diakses dari terminal.
+**(Pastikan proyek sdh berjalan sebelum mengikuti panduan dibawah)**
+- Buka terminal, jalankan perintah: `ngrok http localhost:3000`.
+- Salin link **forwarding** yang muncul, misal: `https://string.ngrok-free.app`.
+- Buka Xendit :
+  - Masuk ke Settings > Developers > Webhooks/Callback.
+  - Cari bagian **PAYMENT REQUESTS V2 (/v2/payment_requests)**
+  - Pada **Payment Succeeded**, isi dengan: forwarding link + `/api/payments/webhook` (contoh: `https://string.ngrok-free.app/api/payments/webhook`).
+  - Klik `Test and save`
+
 
 ### ▶️ Jalankan Proyek
 
@@ -124,14 +147,25 @@ npm run dev
 - [ ] Filter product by category
 
 
-### Day 3 : Cart & payment
+### Day 3 : Cart & QRIS
 [Day3 - Documentation](https://github.com/Itsnope/Simple-POS-nextjs/blob/main/docs/Day3.md)
 
 - [x] Filter product by category
 - [x] Add to cart (global state zustand)
-- [x] Generate QRIS (Xendit)
+- [x] Generate QRIS (Xendit) -> Berjalan bila transaksi &lt; Rp10.000.000 (kalau lebih akan error)
 - [ ] Handle Payment (webhook -> NGROK | Localtunnel)
 
+
+### Day 4 : Payment & Order
+[Day4 - Documentation](https://github.com/Itsnope/Simple-POS-nextjs/blob/main/docs/Day4.md)
+
+- [x] Handle Payment (webhook -> NGROK | Localtunnel)
+- [x] Simulate Payment
+- [x] Fetch orders
+- [x] Filter orders
+- [x] Update order status
+- [x] Data sales
+- [x] Toast notification
 
 
 # Create T3 App

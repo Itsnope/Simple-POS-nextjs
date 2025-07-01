@@ -1,6 +1,6 @@
 # Day 3 : Cart & payment
 
-## 📝 List file changes day 2
+## 📝 List file changes day 3
 
 - Setup Project : 
   - `.env`  
@@ -33,7 +33,7 @@
   - `src\server\xendit.ts`
   Digunakan untuk membuat permintaan pembayaran QRIS melalui API Xendit dengan parameter jumlah, ID pesanan, dan waktu kedaluwarsa.
 
-## ✏️ Note Day 2 
+## ✏️ Note Day 3
 
 Webhook -> POST Request dari Xendit yg dikirim ke API NextJs ketika pembayaran dilakukan
 
