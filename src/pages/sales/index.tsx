@@ -11,6 +11,7 @@ import { useState } from "react";
 import { api } from "@/utils/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OrderStatus } from "@prisma/client";
+import { toRupiah } from "@/utils/toRupiah";
 
 const SalesPage: NextPageWithLayout = () => {
   const apiUtils = api.useUtils();
@@ -31,6 +32,8 @@ const SalesPage: NextPageWithLayout = () => {
         alert("Finished order");
       },
     });
+
+  const { data: salesReport } = api.order.gesSalesReport.useQuery();
 
   // const [orders, setOrders] = useState<Order[]>([
   //   {
@@ -101,17 +104,17 @@ const SalesPage: NextPageWithLayout = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
         <div className="rounded-lg border p-4 shadow-sm">
           <h3 className="text-lg font-medium">Total Revenue</h3>
-          <p className="mt-2 text-3xl font-bold">$0.00</p>
+          <p className="mt-2 text-3xl font-bold">{toRupiah(salesReport?.totalRevenue ?? 0)}</p>
         </div>
 
         <div className="rounded-lg border p-4 shadow-sm">
           <h3 className="text-lg font-medium">Ongoing Orders</h3>
-          <p className="mt-2 text-3xl font-bold">0</p>
+          <p className="mt-2 text-3xl font-bold">{salesReport?.totalOngoingOrders}</p>
         </div>
 
         <div className="rounded-lg border p-4 shadow-sm">
           <h3 className="text-lg font-medium">Completed Orders</h3>
-          <p className="mt-2 text-3xl font-bold">0</p>
+          <p className="mt-2 text-3xl font-bold">{salesReport?.totalCompletedOrders}</p>
         </div>
       </div>
 

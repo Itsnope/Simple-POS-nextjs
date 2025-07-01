@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { promise, z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { createQRIS, xenditPaymentMethodClient } from "@/server/xendit";
 import { addMinutes } from "date-fns";
@@ -276,4 +276,64 @@ export const orderRouter = createTRPCRouter({
 
     }),
 
+  gesSalesReport: protectedProcedure.query(async ({ ctx }) => {
+    const { db } = ctx;
+
+    // total revenue (data yg sudah dibayar processing/done/paid at ada) but not optimize
+      // variabel yg menyimpan promise.
+    const paidOrdersQuery = db.order.findMany({
+      where: {
+        paidAt: {
+          not: null,
+        },
+      },
+      select: {
+        grandTotal: true,
+      },
+    });
+
+    // order yg blm done
+    const ongoingOrdersQuery = db.order.findMany({
+      where: {
+        status: {
+          not: "DONE",
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    // order yg done
+    const completedOrdersQuery = db.order.findMany({
+      where: {
+        status: "DONE",
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    // execute promise diatas secara async dan sesuaikan urutan destructure array 
+    const [paidOrders, ongoingOrders, completedOrders] = await Promise.all([
+      paidOrdersQuery,
+      ongoingOrdersQuery,
+      completedOrdersQuery,
+    ]);
+
+    const totalRevenue = paidOrders.reduce((a, b) => {
+      return a + b.grandTotal;
+    }, 0);
+
+    const totalOngoingOrders = ongoingOrders.length;
+    
+    const totalCompletedOrders = completedOrders.length;
+
+    return {
+      totalRevenue,
+      totalOngoingOrders,
+      totalCompletedOrders,
+    };
+
+  }),
 });
