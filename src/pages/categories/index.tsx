@@ -26,6 +26,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { NextPageWithLayout } from "../_app";
 import { api } from "@/utils/api";
+import { toast } from "sonner";
 
 const CategoriesPage: NextPageWithLayout = () => {
   // menggunakan alat untuk mengelola data yg di cache trpc sisi klien
@@ -66,7 +67,7 @@ const CategoriesPage: NextPageWithLayout = () => {
       onSuccess: async () => {
         // promise jdi merupakan async 
         await apiUtils.category.getCategories.invalidate(); // 4. invalidate data (data yg skrng tdk valid, harus kasi yg baru)
-        alert("Successfully created a new category"); // 1. berhasil buat kategori baru
+        toast("Successfully created a new category"); // 1. berhasil buat kategori baru
         setCreateCategoryDialogOpen(false); // 2. keluar dari modal saat di klik create
         createCategoryForm.reset(); // 3. category name modal ke reset jdi 0
       },
@@ -79,7 +80,7 @@ const CategoriesPage: NextPageWithLayout = () => {
       onSuccess: async () => {
         await apiUtils.category.getCategories.invalidate();
 
-        alert("Successfully edited a new category");
+        toast("Successfully edited a new category");
         setEditCategoryDialogOpen(false);
         editCategoryForm.reset();  // 3. category name modal ke reset jdi 0
         setCategoryToEdit(null);
@@ -92,7 +93,7 @@ const CategoriesPage: NextPageWithLayout = () => {
       onSuccess: async () => {
         await apiUtils.category.getCategories.invalidate();
 
-        alert("Successfully deleted a new category");
+        toast("Successfully deleted a new category");
         setCategoryToDelete(null);
       }
     });

@@ -17,6 +17,7 @@ import { productFormSchema, type ProductFormSchema } from "@/forms/product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { ProductForm } from "@/components/shared/product/ProductForm";
+import { toast } from "sonner";
 
 const ProductsPage: NextPageWithLayout = () => {
   const apiUtils = api.useUtils();
@@ -51,7 +52,7 @@ const ProductsPage: NextPageWithLayout = () => {
     onSuccess: async () => {
       await apiUtils.product.getProducts.invalidate(); // 4. invalidate data (data yg skrng tdk valid, harus kasi yg baru)
 
-      alert("Successfully created a new product"); // 1. berhasil buat kategori baru
+      toast("Successfully created a new product"); // 1. berhasil buat kategori baru
       setCreateProductDialogOpen(false); // 2. keluar dari modal saat di klik create
       createProductForm.reset(); // 3. product name modal ke reset jdi 0
     }
@@ -64,7 +65,7 @@ const ProductsPage: NextPageWithLayout = () => {
   const handleSubmitCreateProduct = (values: ProductFormSchema) => {
     // validasi imageUrl karena nilai uploadedCreateProductImageUrl yg bisa null
     if (!uploadedCreateProductImageUrl) {
-      alert("Please upload a product image first");
+      toast("Please upload a product image first");
       return;
     };
 

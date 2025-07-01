@@ -16,6 +16,7 @@ import type { NextPageWithLayout } from "../_app";
 import { Button } from "@/components/ui/button";
 import { api } from "@/utils/api";
 import { useCartStore } from "@/store/cart";
+import { toast } from "sonner";
 
 const DashboardPage: NextPageWithLayout = () => {
 
@@ -41,7 +42,7 @@ const DashboardPage: NextPageWithLayout = () => {
     const productToAdd = products?.find(product => product.id === productId);
 
     if (!productToAdd) {
-      alert("Product not found");
+      toast("Product not found");
       return;
     };
 

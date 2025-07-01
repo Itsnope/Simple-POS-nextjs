@@ -12,6 +12,7 @@ import { api } from "@/utils/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OrderStatus } from "@prisma/client";
 import { toRupiah } from "@/utils/toRupiah";
+import { toast } from "sonner";
 
 const SalesPage: NextPageWithLayout = () => {
   const apiUtils = api.useUtils();
@@ -29,7 +30,7 @@ const SalesPage: NextPageWithLayout = () => {
           // krna usequery menerima status, maka kita bisa tentukan apa yg di invalidate.
         await apiUtils.order.getOrders.invalidate();
 
-        alert("Finished order");
+        toast("Finished order");
       },
     });
 

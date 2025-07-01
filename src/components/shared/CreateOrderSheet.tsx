@@ -23,6 +23,7 @@ import {
 import { PaymentQRCode } from "./PaymentQrCode";
 import { useCartStore } from "@/store/cart";
 import { api } from "@/utils/api";
+import { toast } from "sonner";
 
 type OrderItemProps = {
   id: string;
@@ -100,7 +101,7 @@ export const CreateOrderSheet = ({
 
   const { mutate: createOrder, data: createOrderResponse } = api.order.createOrder.useMutation({
     onSuccess: () => {
-      alert("Created order");
+      toast("Created order");
 
       setPaymentDialogOpen(true);
     }
@@ -109,7 +110,7 @@ export const CreateOrderSheet = ({
   // mutation simulate payment
   const { mutate: simulatePayment } = api.order.simulatePayment.useMutation({
     onSuccess: () => {
-      alert("Simulated payment");
+      toast("Simulated payment");
     },
   });
 
@@ -143,7 +144,7 @@ export const CreateOrderSheet = ({
       });
     } else {
       // QRIS hanya support transaksi dibawah 10 juta
-      alert("Transaksi harus kurang Rp10.000.000");
+      toast("Transaksi harus kurang Rp10.000.000");
     }
     // setPaymentDialogOpen(true);
     // setPaymentInfoLoading(true);

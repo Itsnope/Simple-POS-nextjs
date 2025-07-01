@@ -8,6 +8,7 @@ import { Bucket } from "@/server/api/bucket";
 import { api } from "@/utils/api";
 import type { ChangeEvent } from "react";
 import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 
 type ProductFormProps = {
   onSubmit: (values: ProductFormSchema) => void;
@@ -62,7 +63,7 @@ export const ProductForm = ({ onSubmit, onChangeImageUrl }: ProductFormProps) =>
       // alert(imageUrl);
       // Mengoper publicUrl dri fungsi imageUrl ke komponen luar (ke parent/product pages)
       onChangeImageUrl(imageUrl);
-      alert("Uploaded image!");
+      toast("Uploaded image!");
     };
   };
   
