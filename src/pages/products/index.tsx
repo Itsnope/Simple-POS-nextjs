@@ -11,7 +11,7 @@ import { PRODUCTS } from "@/data/mock";
 import { ProductMenuCard } from "@/components/shared/product/ProductMenuCard";
 import { ProductCatalogCard } from "@/components/shared/product/ProductCatalogCard";
 import { api } from "@/utils/api";
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useForm } from "react-hook-form";
 import { productFormSchema, type ProductFormSchema } from "@/forms/product";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +25,7 @@ const ProductsPage: NextPageWithLayout = () => {
   // react useState digunakan untuk simpan data di suatu state
   const [uploadedCreateProductImageUrl, setUploadedCreateProductImageUrl] = useState<string | null>(null);
   const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
 
 
@@ -57,6 +58,17 @@ const ProductsPage: NextPageWithLayout = () => {
       createProductForm.reset(); // 3. product name modal ke reset jdi 0
     }
   });
+
+  // DELETE
+  const { mutate: deleteProductById } = 
+    api.product.deleteProductsById.useMutation({
+      onSuccess: async () => {
+        await apiUtils.product.getProducts.invalidate();
+
+        toast("Successfully deleted product");
+        setProductToDelete(null);
+      }
+    })
   
 
 
@@ -77,6 +89,19 @@ const ProductsPage: NextPageWithLayout = () => {
     });
     // alert("create product");
     // alert("create product");
+  };
+
+  // DELETE HANDLE =================================
+  const handleClickDeleteProduct = (productId: string) => {
+    setProductToDelete(productId);
+  };
+
+  const handleConfirmDeleteProduct = () => {
+    if (!productToDelete) return;
+
+    deleteProductById({
+      productId: productToDelete,
+    })
   };
 
 
@@ -155,10 +180,38 @@ const ProductsPage: NextPageWithLayout = () => {
                 price={product.price}
                 image={product.imageUrl ?? "https://placehold.co/600x400"}
                 category={product.category.name}
+
+                onDelete={() => {handleClickDeleteProduct(product.id)}}
               />
             );
           })}
       </div>
+
+      <AlertDialog 
+        open={!!productToDelete}
+        onOpenChange={(open) => {
+          if (!open) {
+            setProductToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            Are you sure you want to delete this product? This action cannot be
+            undone.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleConfirmDeleteProduct}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
     </>
   );
 };

@@ -75,11 +75,11 @@ enum OrderStatus {
 
 model OrderItem {
     id        String @id @default(uuid())
-    productId String
+    productId String?
     orderId   String
 
     // shift + alt + f
-    product Product @relation(fields: [productId], references: [id])
+    product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
     order   Order   @relation(fields: [orderId], references: [id])
 
     // price dipisah dari field product untuk catat price ketika transaksi saja (misal krn diskon).
