@@ -25,6 +25,8 @@ const ProductsPage: NextPageWithLayout = () => {
   // react useState digunakan untuk simpan data di suatu state
   const [uploadedCreateProductImageUrl, setUploadedCreateProductImageUrl] = useState<string | null>(null);
   const [createProductDialogOpen, setCreateProductDialogOpen] = useState(false);
+  const [editProductDialogOpen, setEditProductDialogOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<string | null>(null);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
 
@@ -36,6 +38,10 @@ const ProductsPage: NextPageWithLayout = () => {
     // resolver = validasi form field
     // zodResolver = menghubungkan validasi zod(rulesnya) dgn react hook form(formnya).
   const createProductForm = useForm<ProductFormSchema>({
+    resolver: zodResolver(productFormSchema),
+  });
+
+  const editProductForm = useForm<ProductFormSchema>({
     resolver: zodResolver(productFormSchema),
   });
 
@@ -58,6 +64,19 @@ const ProductsPage: NextPageWithLayout = () => {
       createProductForm.reset(); // 3. product name modal ke reset jdi 0
     }
   });
+
+  // EDIT
+  const { mutate: editProduct } = 
+    api.product.editProducts.useMutation({
+      onSuccess: async () => {
+        await apiUtils.product.getProducts.invalidate();
+
+        toast("Successfully edited a new product");
+        setEditProductDialogOpen(false);
+        editProductForm.reset();  // 3. category name modal ke reset jdi 0
+        setProductToEdit(null);
+      },
+    })
 
   // DELETE
   const { mutate: deleteProductById } = 
@@ -90,6 +109,36 @@ const ProductsPage: NextPageWithLayout = () => {
     // alert("create product");
     // alert("create product");
   };
+
+
+  // EDIT HANDLE ===================================
+  // values = data yg diisi user di form edit produk
+  // handleSubmitEditProduct akan menjalankan mutasi editProduct dengan id produk dari productToEdit
+  const handleSubmitEditProduct = (values: ProductFormSchema) => {
+    if (!productToEdit) return;
+    
+    editProduct({
+      productId: productToEdit,
+      name: values.name,
+      price: values.price,
+      categoryId: values.categoryId,
+      imageUrl: uploadedCreateProductImageUrl ?? values.imageUrl,
+    });
+  };
+
+  // Klik tombol edit
+  const handleClickEditProduct = (product: { id: string; name: string; price: number, categoryId: string, imageUrl: string }) => {
+    setEditProductDialogOpen(true);
+    setProductToEdit(product.id);
+
+    editProductForm.reset({
+      name: product.name,
+      price: product.price,
+      categoryId: product.categoryId,
+      imageUrl: product.imageUrl
+    });
+  };
+
 
   // DELETE HANDLE =================================
   const handleClickDeleteProduct = (productId: string) => {
@@ -130,6 +179,7 @@ const ProductsPage: NextPageWithLayout = () => {
               </AlertDialogHeader>
               <Form {...createProductForm} >
                 <ProductForm 
+                  // Pas user tekan enter handleSubmitCreateProduct jalan
                   // Tidak digunakan secara langsung dialur create
                   onSubmit={handleSubmitCreateProduct}
 
@@ -143,6 +193,7 @@ const ProductsPage: NextPageWithLayout = () => {
               </Form>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
+                {/* Pas button di klik handleSubmitCreateProduct jalan */}
                 {/* Saat di klik createProductForm.handleSubmit diaktifkan dan handleSubmitCreateProduct dijalankan */}
                 <Button 
                   onClick={createProductForm.handleSubmit(
@@ -175,17 +226,60 @@ const ProductsPage: NextPageWithLayout = () => {
         {products?.map((product) => {
             return (
               <ProductCatalogCard 
+
+                // Pas data produk ditampilkan
                 key={product.id}
                 name={product.name}
                 price={product.price}
                 image={product.imageUrl ?? "https://placehold.co/600x400"}
                 category={product.category.name}
 
-                onDelete={() => {handleClickDeleteProduct(product.id)}}
+                // Pas edit di klik
+                onEdit={() => handleClickEditProduct({
+                  id : product.id,
+                  name : product.name,
+                  price : product.price,
+                  categoryId : product.category.id,
+                  imageUrl : product.imageUrl ?? "https://placehold.co/600x400",
+                })}
+
+                // Pas delete di klik
+                onDelete={() => handleClickDeleteProduct(product.id)}
               />
             );
           })}
       </div>
+
+      <AlertDialog
+        open={editProductDialogOpen}
+        onOpenChange={setEditProductDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Edit Product</AlertDialogTitle>
+          </AlertDialogHeader>
+          <Form {...editProductForm}>
+            <ProductForm
+              // handleSubmitEditProduct jalan saat user tekan enter
+              onSubmit={handleSubmitEditProduct}
+              onChangeImageUrl={(imageUrl) => {
+                setUploadedCreateProductImageUrl(imageUrl);
+              }}
+              // submitText="Edit Category"
+            />
+          </Form>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            {/* handleSubmitEditProduct jalan saat user tekan tombol */}
+            <Button
+              onClick={editProductForm.handleSubmit(handleSubmitEditProduct)}
+            >
+              Edit Product
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog 
         open={!!productToDelete}

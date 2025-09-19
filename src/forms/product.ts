@@ -10,7 +10,8 @@ export const productFormSchema = z.object({
 
   // coerce = convert ke tipe yg di declare berikutnya/setelahnya (number)
   price: z.coerce.number().min(1000),
-  categoryId: z.string()
+  categoryId: z.string(),
+  imageUrl: z.string(),
 });
 
 // type typescript yg refleksikan product schema

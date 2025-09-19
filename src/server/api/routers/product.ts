@@ -91,6 +91,37 @@ export const productRouter = createTRPCRouter({
     return newProduct;
   }),
 
+  // EDIT =================================================
+  editProducts: protectedProcedure
+  .input(
+    z.object({
+      productId: z.string(),
+      name: z.string().min(3, "Minimum of 3 characters"),
+      price: z.number().min(1000),
+      categoryId: z.string(),
+      imageUrl: z.string().url(),
+    })
+  )
+  .mutation(async ({ ctx, input }) => {
+    const { db } = ctx;
+
+    await db.product.update({
+      where: {
+        id: input.productId,
+      },
+      data: {
+        name: input.name,
+        price: input.price,
+        category: {
+          connect: {
+            id: input.categoryId,
+          },
+        },
+        imageUrl: input.imageUrl,
+      },
+    });
+  }),
+
   // DELETE ===================================================
   deleteProductsById: protectedProcedure
   .input(

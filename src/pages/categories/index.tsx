@@ -51,9 +51,9 @@ const CategoriesPage: NextPageWithLayout = () => {
   // QUERIES & MUTATIONS =========================================================
   
   // READ
-  // function untuk mengambil data dari db
-  // category diambil dari root.ts (createTRPCRouter)
-  // data: categories, mengganti nama data menjadi categories
+  // function untuk mengambil data dari db.
+    // category diambil dari root.ts (createTRPCRouter).
+    // data: categories, mengganti nama data menjadi categories.
   const { data: categories, isLoading: categoriesIsLoading } = 
     api.category.getCategories.useQuery();
 
