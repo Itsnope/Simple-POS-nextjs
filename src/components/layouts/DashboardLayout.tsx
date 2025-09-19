@@ -79,7 +79,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       <div className="flex h-screen w-full">
         <Sidebar>
           <SidebarHeader className="p-4">
-            <h2 className="text-xl font-bold">Simple POS</h2>
+            <h2 className="text-xl font-bold">Kasir Sederhana</h2>
           </SidebarHeader>
           <SidebarContent className="px-4">
             <SidebarMenu>
