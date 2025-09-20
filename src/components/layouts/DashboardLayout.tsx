@@ -1,4 +1,4 @@
-import { BarChart3, Grid3X3, Package, ShoppingCart, Sun } from "lucide-react";
+import { BarChart3, Grid3X3, Package, ShoppingCart, Sun, Menu } from "lucide-react";
 import React, { type ReactNode } from "react";
 
 import {
@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarSeparator,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -78,9 +79,18 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     <SidebarProvider defaultOpen={true}>
       <div className="flex h-screen w-full">
         <Sidebar>
-          <SidebarHeader className="p-4">
+          <SidebarHeader className="p-4 flex justify-between items-center">
             <h2 className="text-xl font-bold">Kasir Sederhana</h2>
+            {/* Toggle button hanya muncul di mobile */}
+            <div className="md:hidden">
+              <SidebarTrigger>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SidebarTrigger>
+            </div>
           </SidebarHeader>
+
           <SidebarContent className="px-4">
             <SidebarMenu>
               <SidebarMenuItem>
@@ -140,6 +150,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
+
           {/* <SidebarFooter className="p-4">
             <p className="text-muted-foreground text-xs">Simple POS v1.0</p>
             <div className="flex items-center gap-2">
@@ -150,7 +161,18 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </SidebarFooter> */}
         </Sidebar>
 
-        <main className="relative flex-1 overflow-auto p-6">{children}</main>
+        <main className="relative flex-1 overflow-auto p-6">
+          {/* Toggle button untuk mobile di atas konten */}
+          <div className="mb-4 md:hidden">
+            <SidebarTrigger>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SidebarTrigger>
+          </div>
+
+          {children}
+        </main>
       </div>
     </SidebarProvider>
   );
