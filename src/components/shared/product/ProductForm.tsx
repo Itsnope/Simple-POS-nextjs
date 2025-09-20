@@ -62,6 +62,7 @@ export const ProductForm = ({ onSubmit, onChangeImageUrl }: ProductFormProps) =>
 
       // alert(imageUrl);
       // Mengoper publicUrl dri fungsi imageUrl ke komponen luar (ke parent/product pages)
+      form.setValue("imageUrl", imageUrl);
       onChangeImageUrl(imageUrl);
       toast("Uploaded image!");
     };
@@ -134,12 +135,32 @@ export const ProductForm = ({ onSubmit, onChangeImageUrl }: ProductFormProps) =>
         )}
       />
 
-      <div className="space-y-1">
+      <FormField
+        control={form.control}
+        name="imageUrl"
+        render={() => (
+          <FormItem>
+            <FormLabel>Product Image</FormLabel>
+            <FormControl>
+              {/* Input file */}
+              <Input 
+                type="file" 
+                accept="image/*" 
+                onChange={imageChangeHandlder} 
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+
+      {/* <div className="space-y-1">
         <Label>Product Image</Label>
 
-        {/* onChange hanya ke-trigger saat user sdh pilih file */}
+        onChange hanya ke-trigger saat user sdh pilih file
         <Input onChange={imageChangeHandlder} type="file" accept="image/*" />
-      </div>
+      </div> */}
 
     </form>
   );

@@ -39,6 +39,9 @@ const ProductsPage: NextPageWithLayout = () => {
     // zodResolver = menghubungkan validasi zod(rulesnya) dgn react hook form(formnya).
   const createProductForm = useForm<ProductFormSchema>({
     resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      imageUrl: "",
+    }
   });
 
   const editProductForm = useForm<ProductFormSchema>({
@@ -95,18 +98,17 @@ const ProductsPage: NextPageWithLayout = () => {
   // CREATE HANDLE =============================================
   const handleSubmitCreateProduct = (values: ProductFormSchema) => {
     // validasi imageUrl karena nilai uploadedCreateProductImageUrl yg bisa null
-    if (!uploadedCreateProductImageUrl) {
-      toast("Please upload a product image first");
-      return;
-    };
+    // if (!values.imageUrl) {
+    //   toast("Please upload a product image first");
+    //   return;
+    // }
 
     createProducts({
       name: values.name,
       price: values.price,
       categoryId: values.categoryId,
-      imageUrl: uploadedCreateProductImageUrl,
+      imageUrl: values.imageUrl,
     });
-    // alert("create product");
     // alert("create product");
   };
 
