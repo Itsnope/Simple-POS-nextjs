@@ -191,7 +191,7 @@ const CategoriesPage: NextPageWithLayout = () => {
       </DashboardHeader>
 
       {/* Tampilan UI categoriesnya */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {categories?.map((category) => {
           return (
             <CategoryCatalogCard 
