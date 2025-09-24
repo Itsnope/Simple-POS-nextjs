@@ -39,6 +39,8 @@ const CategoriesPage: NextPageWithLayout = () => {
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [categoryToEdit, setCategoryToEdit] = useState<string | null>(null);
 
+  const { data: products } = api.product.getProducts.useQuery();
+
   // FORMS =====================================================================
   const createCategoryForm = useForm<CategoryFormSchema>({
     resolver: zodResolver(categoryFormSchema),
@@ -193,11 +195,15 @@ const CategoriesPage: NextPageWithLayout = () => {
       {/* Tampilan UI categoriesnya */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {categories?.map((category) => {
+
+          // Hitung jumlah produk untuk tiap kategori (id kategori)
+          const productCategory = products?.filter((product) => product.category.id === category.id).length ?? 0;
+          
           return (
             <CategoryCatalogCard 
               key={category.id} 
               name={category.name} 
-              productCount={category.productCount}
+              productCount={productCategory}
               // tombol edit (handleClickEditCategory nerima type category= ada id, name, count)
               onEdit={() => handleClickEditCategory({ 
                   id: category.id, 
