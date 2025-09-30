@@ -167,6 +167,11 @@ npm run dev
 - [x] Data sales
 - [x] Toast notification
 
+### Day 5 : Complete
+[Day5 - Complete]()
+- [x] Edit Product 
+- [x] Delete product
+
 
 # Create T3 App
 

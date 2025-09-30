@@ -27,7 +27,7 @@
       - router finishOrder.
       - support filter order (getOrders).
       - router gesSalesReport.
-  - `src\components\shared\CreateOrderSheet.tsx`
+  - `src\components\shared\CreateOrderSheet.tsx`~
   Merupakan UI dan logic utama untuk proses checkout dan pembayaran order.
     - Day 4 - add : 
       - Fitur simulate payment
